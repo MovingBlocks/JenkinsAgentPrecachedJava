@@ -1,4 +1,4 @@
-FROM jenkins/agent
+FROM jenkins/agent:jdk8
 
 MAINTAINER cervator@gmail.com
 
@@ -11,14 +11,14 @@ RUN mkdir -p ~/.gradle \
 RUN cd ~/ws \
     && git clone https://github.com/MovingBlocks/joml-ext.git \
     && cd joml-ext \
-    &&  ./gradlew compileJava \
+    &&  ./gradlew compileTestJava \
     && rm -rf ~/ws/joml-ext
 
 # This step builds the Terasology engine. As a special step it prepares a "build harness" to build modules standalone
 RUN cd ~/ws \
     && git clone https://github.com/MovingBlocks/Terasology.git \
     && cd Terasology \
-    &&  ./gradlew extractNatives extractConfig compileJava \
+    &&  ./gradlew extractNatives extractConfig compileTestJava \
     && mkdir -p ~/ws/harness &&  mkdir -p ~/ws/harness/build-logic/src \
         && cp gradlew ~/ws/harness \
         && cp -r gradle ~/ws/harness/gradle \
@@ -35,5 +35,5 @@ RUN cd ~/ws \
     && git clone https://github.com/Terasology/Sample.git \
     && cd Sample \
     && cp -r ~/ws/harness/* . \
-    && ./gradlew compileJava \
+    && ./gradlew compileTestJava \
     && rm -rf ~/ws/Sample
