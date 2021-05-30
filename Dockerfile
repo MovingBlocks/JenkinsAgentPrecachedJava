@@ -5,7 +5,13 @@ MAINTAINER cervator@gmail.com
 # Prep some basics - make dirs and disable the Gradle daemon (one-time build agents gain nothing from the daemon)
 RUN mkdir -p ~/.gradle \
     # && echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties \ # ... unless you have a multi-phase build
-    && mkdir ~/ws
+    && mkdir ~/ws \
+    # Throw kubectl into the mix since convenient in some cases for Jenkins (version-tied to the Terasology Kubernetes
+    && curl -LO https://dl.k8s.io/release/v1.18.0/bin/linux/amd64/kubectl \
+    && chmod a+x kubectl \
+    && mkdir -p ~/.local/bin/kubectl \
+    && mv ./kubectl ~/.local/bin/kubectl \
+    && echo "export PATH=\$PATH:~/.local/bin/kubectl" >> .bashrc
 
 # Now grab some source code and run a minimal Gradle build to force fetching of wrappers and any immediate dependencies
 RUN cd ~/ws \
@@ -36,4 +42,9 @@ RUN cd ~/ws \
     && cd Sample \
     && cp -r ~/ws/harness/* . \
     && ./gradlew compileTestJava \
+    # Stop any Gradle daemons running - TODO: should be done after every build? In some cases can be reused during image build, but not later in "real" builds
+#    && ./gradlew --stop \
     && rm -rf ~/ws/Sample
+
+# Delete the whole Gradle daemon dir - just contains log files and daemon status files we can't use anyway
+RUN rm -rf ~/.gradle/daemon
