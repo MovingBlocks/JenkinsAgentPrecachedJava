@@ -2,16 +2,17 @@ FROM jenkins/agent:jdk8
 
 MAINTAINER cervator@gmail.com
 
+# Due to Jenkins weirdness around PATH on agents we cheat and just dump kubectl into a dir already on the path
+USER root
+RUN curl -LO https://dl.k8s.io/release/v1.18.0/bin/linux/amd64/kubectl \
+    && chmod a+x kubectl \
+    && mv ./kubectl /usr/local/bin/kubectl
+USER jenkins
+
 # Prep some basics - make dirs and disable the Gradle daemon (one-time build agents gain nothing from the daemon)
 RUN mkdir -p ~/.gradle \
     # && echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties \ # ... unless you have a multi-phase build
-    && mkdir ~/ws \
-    # Throw kubectl into the mix since convenient in some cases for Jenkins (version-tied to the Terasology Kubernetes
-    && curl -LO https://dl.k8s.io/release/v1.18.0/bin/linux/amd64/kubectl \
-    && chmod a+x kubectl \
-    && mkdir -p ~/.local/bin/kubectl \
-    && mv ./kubectl ~/.local/bin/kubectl \
-    && echo "export PATH=\$PATH:~/.local/bin/kubectl" >> .bashrc
+    && mkdir ~/ws
 
 # Now grab some source code and run a minimal Gradle build to force fetching of wrappers and any immediate dependencies
 RUN cd ~/ws \
