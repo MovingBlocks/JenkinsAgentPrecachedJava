@@ -3,15 +3,6 @@ FROM jenkins/agent:$JDKVERSION
 
 MAINTAINER terasology@gmail.com
 
-USER root
-
-# For some reason the upstream image mixed up the distro used and may have purged curl as part of the build? Huh. Try to add
-RUN apk add curl
-
-# Due to Jenkins weirdness around PATH on agents we cheat and just dump kubectl into a dir already on the path
-RUN curl -LO https://dl.k8s.io/release/v1.18.0/bin/linux/amd64/kubectl \
-    && chmod a+x kubectl \
-    && mv ./kubectl /usr/local/bin/kubectl
 USER jenkins
 
 # Prep some basics - make dirs and disable the Gradle daemon (one-time build agents gain nothing from the daemon)
