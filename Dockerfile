@@ -1,6 +1,7 @@
-FROM jenkins/agent:jdk8
+ARG JDKVERSION=jdk8
+FROM jenkins/agent:$JDKVERSION
 
-MAINTAINER cervator@gmail.com
+MAINTAINER terasology@gmail.com
 
 # Due to Jenkins weirdness around PATH on agents we cheat and just dump kubectl into a dir already on the path
 USER root

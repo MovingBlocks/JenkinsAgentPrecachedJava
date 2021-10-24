@@ -14,7 +14,7 @@ First be sure to create the included config map if not already present in the cl
 Under a Kubernetes cloud add a new Pod Template with the following settings (and any others you would like to change):
 
 * Container name: `jnlp`
-* Docker image: `cervator/pre-cached-jenkins-agent`
+* Docker image: `terasology/pre-cached-jenkins-agent:latest-jdk8` (or 11)
 * Working directory: `/home/jenkins/agent`
 * Command to run: `/bin/sh`
 * Arguments to pass to the command: `/var/jenkins_config/jenkins-agent`
