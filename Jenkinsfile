@@ -26,7 +26,6 @@ pipeline {
                     }
                 }
                 environment {
-                    DOCKER_CRED = credentials('docker-hub-terasology-token')
                     DOCKER_TAG = deduceDockerTag()
                 }
 
@@ -34,19 +33,27 @@ pipeline {
                     stage('Configure') {
                         steps {
                             container('kaniko') {
-                                sh '''
-                                    set +x
-                                    tokenVar=$(echo -n $DOCKER_CRED | base64) > out.log 2>&1
-                                    sed -i "s/PLACEHOLDER/$tokenVar/g" config.json > out.log 2>&1
-                                    set -x
-                                    cp config.json /kaniko/.docker/config.json
-                                '''
+                                withCredentials([usernameColonPassword(credentialsId: 'docker-hub-terasology-token', variable: 'DOCKER_CRED')]) {
+                                    writeFile(
+                                        file: 'config.json',  // no permission to write to /kaniko directly
+                                        text: readFile('config.tmpl.json').replaceAll(
+                                            'PLACEHOLDER',
+                                            DOCKER_CRED.bytes.encodeBase64().toString()
+                                        )
+                                    )
+                                    sh 'mv config.json "${DOCKER_CONFIG}/config.json"'
+                                }
                             }
                         }
                     }
                     stage('Build') {
                         steps {
                             container('kaniko') {
+                                // Some troubleshooting trying to figure out if we got config.json right without
+                                // revealing its secrets:
+                                //     sh returnStatus: true, script: 'grep -c PLACEHOLDER ${DOCKER_CONFIG}config.json'
+                                //     sh returnStatus: true, script: 'grep -c DOCKER_CRED ${DOCKER_CONFIG}config.json'
+                                //     sh 'grep -c index.docker.io ${DOCKER_CONFIG}config.json'
                                 sh '''
                                     /kaniko/executor -f ./Dockerfile -c $(pwd) --reproducible \\
                                         --destination=terasology/jenkins-precached-agent:$DOCKER_TAG-$JDKVERSION \\
