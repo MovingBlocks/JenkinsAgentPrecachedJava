@@ -39,7 +39,7 @@ pipeline {
             steps {
                 container('kaniko') {
                     sh '''
-                        /kaniko/executor -f ./Dockerfile -c $(pwd) --reproducible --destination=terasology/jenkins-precached-agent:$DOCKER_TAG-jdk8 --build-arg JDKVERSION=jdk8
+                        /kaniko/executor -f ./Dockerfile -c $(pwd) --reproducible --destination=terasology/jenkins-precached-agent:$DOCKER_TAG-jdk8 --build-arg JDKVERSION=jdk8 --cleanup
                     '''
                 }
             }
