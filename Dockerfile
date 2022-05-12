@@ -8,7 +8,7 @@ USER jenkins
 # Prep some basics - make dirs and disable the Gradle daemon (one-time build agents gain nothing from the daemon)
 RUN mkdir -p ~/.gradle \
     # && echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties \ # ... unless you have a multi-phase build
-    && mkdir ~/ws
+    && mkdir -p ~/ws
 
 # Now grab some source code and run a minimal Gradle build to force fetching of wrappers and any immediate dependencies
 RUN cd ~/ws \
