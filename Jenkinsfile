@@ -40,7 +40,7 @@ pipeline {
                 catchError(buildResult: 'UNSTABLE', catchInterruptions: false, stageResult: 'FAILURE') {
                 container('kaniko') {
                     sh '''
-                        /kaniko/executor -f ./Dockerfile -c $(pwd) --snapshotMode=redo --reproducible --destination=terasology/jenkins-precached-agent:$DOCKER_TAG-jdk8 --build-arg JDKVERSION=jdk8 --cleanup
+                        /kaniko/executor -f ./Dockerfile -c $(pwd) --reproducible --destination=terasology/jenkins-precached-agent:$DOCKER_TAG-jdk8 --build-arg JDKVERSION=jdk8 --cleanup
                     '''
                 }
                 }
@@ -50,7 +50,7 @@ pipeline {
             steps {
                 container('kaniko') {
                     sh '''
-                        /kaniko/executor -f ./Dockerfile -c $(pwd) --snapshotMode=redo --reproducible --destination=terasology/jenkins-precached-agent:$DOCKER_TAG-jdk11 --build-arg JDKVERSION=jdk11 --cleanup
+                        /kaniko/executor -f ./Dockerfile -c $(pwd) --reproducible --destination=terasology/jenkins-precached-agent:$DOCKER_TAG-jdk11 --build-arg JDKVERSION=jdk11 --cleanup
                     '''
                 }
             }
