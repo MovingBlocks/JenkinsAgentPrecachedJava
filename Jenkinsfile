@@ -37,10 +37,12 @@ pipeline {
         }
         stage('Java 8') {
             steps {
+                catchError(buildResult: 'UNSTABLE', catchInterruptions: false, stageResult: 'FAILURE') {
                 container('kaniko') {
                     sh '''
                         /kaniko/executor -f ./Dockerfile -c $(pwd) --snapshotMode=redo --reproducible --destination=terasology/jenkins-precached-agent:$DOCKER_TAG-jdk8 --build-arg JDKVERSION=jdk8 --cleanup
                     '''
+                }
                 }
             }
         }
