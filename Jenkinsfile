@@ -22,7 +22,7 @@ pipeline {
                 axes {
                     axis {
                         name "JDKVERSION"
-                        values "jdk8", "jdk11"
+                        values "jdk8", "jdk11", "jdk17"
                     }
                 }
                 environment {
